@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import { useState, MouseEvent } from "react";
 import * as ReactDOM from "react-dom";
-import behr from "./behr.png";
+const behrImgSrc = require('./behr.png')
 
 function render() {
   ReactDOM.render(<App />, document.body);
@@ -22,20 +22,20 @@ function Image() {
   const [left, setLeft] = useState(100);
   const [isDragging, setIsDragging] = useState(false);
 
-  const handleStartMouseDrag = (e) => {
+  const handleStartMouseDrag = (e: MouseEvent) => {
     e.preventDefault();
     if (!isDragging) {
       setIsDragging(true);
     }
   };
 
-  const handleEndMouseDrag = (e) => {
+  const handleEndMouseDrag = (e: MouseEvent) => {
     if (isDragging) {
       setIsDragging(false);
     }
   };
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: MouseEvent) => {
     if (!isDragging) {
       return;
     }
@@ -49,7 +49,7 @@ function Image() {
       id="image-confetti"
       height={IMAGE_DIMENSION}
       width={IMAGE_DIMENSION}
-      src={behr}
+      src={behrImgSrc}
       style={{ cursor: "grab", top, left, position: "absolute" }}
       onMouseDown={handleStartMouseDrag}
       onMouseUp={handleEndMouseDrag}
