@@ -46,6 +46,7 @@ function Image() {
 
   return (
     <img
+      id="image-confetti"
       height={IMAGE_DIMENSION}
       width={IMAGE_DIMENSION}
       src={behr}
