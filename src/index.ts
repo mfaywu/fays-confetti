@@ -27,6 +27,7 @@ const createWindow = (): void => {
     },
     frame: false,
     transparent: true,
+    icon: './icon.png'
   });
 
   mainWindow.setAlwaysOnTop(true, 'screen-saver')
