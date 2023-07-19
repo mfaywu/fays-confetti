@@ -1,6 +1,6 @@
-import { useState, MouseEvent } from "react";
+import { useState, MouseEvent, useEffect } from "react";
 import * as ReactDOM from "react-dom";
-const behrImgSrc = require('./behr.png')
+import behrImgSrc = require("./behr.png");
 
 function render() {
   ReactDOM.render(<App />, document.body);
@@ -9,17 +9,28 @@ function render() {
 render();
 
 function App() {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
   return (
-    <>
-      <Image />
-    </>
+    <div style={{ overflow: "hidden" }}>
+      <Image screenWidth={width} screenHeight={height} />
+      <Image screenWidth={width} screenHeight={height} />
+      <Image screenWidth={width} screenHeight={height} />
+      <Image screenWidth={width} screenHeight={height} />
+      <Image screenWidth={width} screenHeight={height} />
+    </div>
   );
 }
 
-function Image() {
+function Image(props: { screenWidth: number; screenHeight: number }) {
+  const { screenWidth, screenHeight } = props;
   const IMAGE_DIMENSION = 100;
-  const [top, setTop] = useState(100);
-  const [left, setLeft] = useState(100);
+  const [top, setTop] = useState(
+    Math.floor(Math.random() * screenHeight) - IMAGE_DIMENSION / 2 - window.innerHeight
+  );
+  const [left, setLeft] = useState(
+    Math.floor(Math.random() * screenWidth) - IMAGE_DIMENSION / 2
+  );
   const [isDragging, setIsDragging] = useState(false);
 
   const handleStartMouseDrag = (e: MouseEvent) => {
@@ -31,7 +42,7 @@ function Image() {
 
   const handleEndMouseDrag = (e: MouseEvent) => {
     if (isDragging) {
-      setIsDragging(false);
+      setIsDragging(false)
     }
   };
 
@@ -44,9 +55,23 @@ function Image() {
     setLeft(e.clientX - IMAGE_DIMENSION / 2);
   };
 
+  useEffect(() => {
+    setTimeout(() => {
+      if (!isDragging) {
+        top + 1 > window.innerHeight ? setTop(-IMAGE_DIMENSION) : setTop(top + 1);        
+      }
+    }, 10);
+  }, [top, isDragging, window.innerHeight]);
+
+  useEffect(() => {
+    if (top === -IMAGE_DIMENSION) {
+        setLeft(Math.floor(Math.random() * window.innerWidth));
+    }
+  }, [top])
+
   return (
     <img
-      id="image-confetti"
+      className="image-confetti"
       height={IMAGE_DIMENSION}
       width={IMAGE_DIMENSION}
       src={behrImgSrc}

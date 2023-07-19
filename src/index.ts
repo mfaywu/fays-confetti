@@ -10,9 +10,9 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
-const createWindow = (): void => {
+const createWindow = async (): Promise<void> => {
   // We cannot require the screen module until the app is ready.
-  const { screen } = require('electron')
+  const { screen } = await require('electron')
 
   // Create a window that fills the screen's available work area.
   const primaryDisplay = screen.getPrimaryDisplay()
@@ -30,7 +30,7 @@ const createWindow = (): void => {
     icon: './icon.png'
   });
 
-  mainWindow.setAlwaysOnTop(true, 'screen-saver')
+  mainWindow.setAlwaysOnTop(true, 'floating')
 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
