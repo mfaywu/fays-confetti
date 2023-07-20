@@ -1,6 +1,18 @@
-import { useState, MouseEvent, useEffect } from "react";
+import { useState, MouseEvent, useEffect, SetStateAction } from "react";
 import * as ReactDOM from "react-dom";
 import behrImgSrc = require("./behr.png");
+// import fs from "fs"; // todo this didn't work
+
+export interface IElectronAPI {
+  onSetImage: (callback: (event: Electron.IpcRendererEvent, ...args: unknown[]) => void) => Promise<void>,
+  removeSetImageListener: () => void
+}
+
+declare global {
+  interface Window {
+    api: IElectronAPI
+  }
+}
 
 function render() {
   ReactDOM.render(<App />, document.body);
@@ -23,6 +35,20 @@ function App() {
 }
 
 function Image(props: { screenWidth: number; screenHeight: number }) {
+  const [imagePath, setImagePath] = useState(undefined);
+  
+  useEffect(() => {
+    window.api.onSetImage((_event: Electron.IpcRendererEvent, value: SetStateAction<string>) => {
+      console.log('setImagePath: ', value)
+      setImagePath(value)
+    })
+    return () => window.api.removeSetImageListener()
+  }, [])
+
+  useEffect(() => {
+    console.log('imagePath changed: ', imagePath)
+  }, [imagePath])
+
   const { screenWidth, screenHeight } = props;
   const IMAGE_DIMENSION = 100;
   const [top, setTop] = useState(
@@ -69,12 +95,18 @@ function Image(props: { screenWidth: number; screenHeight: number }) {
     }
   }, [top])
 
+  if(imagePath === undefined) {
+    return null
+  }
+
   return (
     <img
       className="image-confetti"
       height={IMAGE_DIMENSION}
       width={IMAGE_DIMENSION}
-      src={behrImgSrc}
+      // src={FileReader.prototype.readAsDataURL(imagePath)}
+      // src={'data:image/png;base64,' + fs.readFileSync('file://' + imagePath).toString('base64')}
+      src={''} // todo none of these worked
       style={{ cursor: "grab", top, left, position: "absolute" }}
       onMouseDown={handleStartMouseDrag}
       onMouseUp={handleEndMouseDrag}

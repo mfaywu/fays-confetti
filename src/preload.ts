@@ -1,7 +1,7 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
-import { ipcRenderer } from "electron";
+import { contextBridge, ipcRenderer } from "electron";
 
 window.addEventListener("DOMContentLoaded", () => {
   const elements = document.getElementsByClassName("image-confetti");
@@ -14,3 +14,8 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+contextBridge.exposeInMainWorld('api', {
+  onSetImage: (callback: (event: Electron.IpcRendererEvent, ...args: unknown[]) => void) => {ipcRenderer.on('set-image', callback)},
+  removeSetImageListener: () => {ipcRenderer.removeAllListeners('set-image')},
+})

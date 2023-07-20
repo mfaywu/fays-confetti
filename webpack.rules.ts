@@ -1,4 +1,5 @@
 import type { ModuleOptions } from 'webpack';
+import path from 'path';
 
 export const rules: Required<ModuleOptions>['rules'] = [
   // Add support for native node modules
@@ -30,6 +31,9 @@ export const rules: Required<ModuleOptions>['rules'] = [
   },
   {
     test: /\.(png|svg|jpg|jpeg|gif)$/i,
+    // include: [ // todo this didn't work
+    //   path.resolve(__dirname, "/images")
+    // ],
     type: 'asset/resource',
   },
 ];
