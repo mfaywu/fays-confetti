@@ -1,7 +1,5 @@
 import { useState, MouseEvent, useEffect, SetStateAction } from "react";
 import * as ReactDOM from "react-dom";
-import behrImgSrc = require("./behr.png");
-// import fs from "fs"; // todo this didn't work
 
 export interface IElectronAPI {
   onSetImage: (callback: (event: Electron.IpcRendererEvent, ...args: unknown[]) => void) => Promise<void>,
@@ -104,9 +102,7 @@ function Image(props: { screenWidth: number; screenHeight: number }) {
       className="image-confetti"
       height={IMAGE_DIMENSION}
       width={IMAGE_DIMENSION}
-      // src={FileReader.prototype.readAsDataURL(imagePath)}
-      // src={'data:image/png;base64,' + fs.readFileSync('file://' + imagePath).toString('base64')}
-      src={''} // todo none of these worked
+      src="fay://pets/behr.png"
       style={{ cursor: "grab", top, left, position: "absolute" }}
       onMouseDown={handleStartMouseDrag}
       onMouseUp={handleEndMouseDrag}
