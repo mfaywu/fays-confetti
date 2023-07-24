@@ -17,6 +17,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
 contextBridge.exposeInMainWorld('api', {
   onSetImage: (callback: (event: Electron.IpcRendererEvent, ...args: unknown[]) => void) => {ipcRenderer.on('set-image', callback)},
-  setDefaultImage: () => ipcRenderer.send('set-default-image'),
+  setImage: (image: string | null) => ipcRenderer.send('set-image', false, { image}),
   removeSetImageListener: () => {ipcRenderer.removeAllListeners('set-image')},
 })

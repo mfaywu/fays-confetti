@@ -214,11 +214,24 @@ ipcMain.on("set-ignore-mouse-events", (event, ignore, options) => {
   win && win.setIgnoreMouseEvents(ignore, options);
 });
 
-ipcMain.on("set-default-image", (event) => {
+ipcMain.on("set-image", (event, _ignore, options) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   if (!win) throw new Error("No window found");
 
   const appDataPath = app.getPath("userData");
+  const image = options.image;
+  if (image) {
+    if (fs.existsSync(appDataPath + "/images/" + image)) {
+      console.log('Image found, setting image to ' + image)
+      win.webContents.send("set-image", image);
+      return
+    } else {
+      console.log('Image ' + image + ' was not found')
+    }
+  }
+
+  // If no image is specified, or if the specified image doesn't exist, use the default image
+
   const behr = "behr.png";
   const behrImgPath = appDataPath + "/images/" + behr;
 
@@ -230,7 +243,7 @@ ipcMain.on("set-default-image", (event) => {
   // Check if this behr image file (the default image for Raining Dogs) exists already
   if (!fs.existsSync(appDataPath + "/images/" + behr)) {
     // If not, copy the behr image file from the app's resources folder
-    fs.readFile(path.join(process.cwd(), "./src/" + behr), (err, data) => {
+    fs.readFile(path.join(app.getAppPath(), "./src/" + behr), (err, data) => {
       if (err) throw err;
 
       fs.writeFile(behrImgPath, data, {}, (err) => {
@@ -238,6 +251,6 @@ ipcMain.on("set-default-image", (event) => {
       });
     });
   }
-
+  console.log('Setting image to default ' + behr)
   win.webContents.send("set-image", behr);
 });
