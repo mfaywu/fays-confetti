@@ -13,6 +13,22 @@ if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
+function setImage(imagePath: string) {
+  fs.readFile(imagePath, (err, data) => {
+    if (err) throw err;
+    const appDataPath = app.getPath("userData");
+    const newImage = Date.now() + path.extname(imagePath)
+    const newImagePath = 
+      appDataPath + "/images/" + newImage;
+
+    fs.writeFile(newImagePath, data, {}, (err) => {
+      const win = BrowserWindow.getFocusedWindow();
+      win && win.webContents.send("set-image", newImage);
+      if (err) throw err;
+    });
+  });
+}
+
 /**
  * Setting a menu
  * */
@@ -58,20 +74,7 @@ const template: Electron.MenuItemConstructorOptions[] | Electron.MenuItem[] = [
             }
           );
           if (chooseImageAttempt.filePaths.length > 0) {
-            fs.readFile(chooseImageAttempt.filePaths[0], (err, data) => {
-              if (err) throw err;
-              const appDataPath = app.getPath("userData");
-              const newImage = Date.now() + path.extname(chooseImageAttempt.filePaths[0])
-              const newImagePath = 
-                appDataPath + "/images/" + newImage;
-
-              fs.writeFile(newImagePath, data, {}, (err) => {
-                // window.localStorage.setItem("image", newImage);  todo fix this
-                const win = BrowserWindow.getFocusedWindow();
-                win && win.webContents.send("set-image", newImage);
-                if (err) throw err;
-              });
-            });
+            setImage(chooseImageAttempt.filePaths[0])
           }
         },
       },
@@ -164,6 +167,12 @@ const createWindow = async (): Promise<void> => {
   // and load the index.html of the app.
   mainBrowserWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 };
+
+app.on('open-file', (event, path) => {
+  event.preventDefault()
+  console.log('OPEN FILE')
+  setImage(path)
+})
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
