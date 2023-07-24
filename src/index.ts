@@ -231,26 +231,6 @@ ipcMain.on("set-image", (event, _ignore, options) => {
   }
 
   // If no image is specified, or if the specified image doesn't exist, use the default image
-
-  const behr = "behr.png";
-  const behrImgPath = appDataPath + "/images/" + behr;
-
-  // Check if images folder exists, create if not
-  if (!fs.existsSync(appDataPath + "/images")) {
-    fs.mkdirSync(appDataPath + "/images");
-  }
-
-  // Check if this behr image file (the default image for Raining Dogs) exists already
-  if (!fs.existsSync(appDataPath + "/images/" + behr)) {
-    // If not, copy the behr image file from the app's resources folder
-    fs.readFile(path.join(app.getAppPath(), "./src/" + behr), (err, data) => {
-      if (err) throw err;
-
-      fs.writeFile(behrImgPath, data, {}, (err) => {
-        if (err) throw err;
-      });
-    });
-  }
-  console.log('Setting image to default ' + behr)
-  win.webContents.send("set-image", behr);
+  console.log('Setting image to default behr')
+  win.webContents.send("set-image", null);
 });

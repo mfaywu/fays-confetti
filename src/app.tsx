@@ -1,5 +1,6 @@
 import { useState, MouseEvent, useEffect, SetStateAction } from "react";
 import * as ReactDOM from "react-dom";
+import behrImg from './behr.png'
 
 export interface IElectronAPI {
   onSetImage: (callback: (event: Electron.IpcRendererEvent, ...args: unknown[]) => void) => Promise<void>,
@@ -34,7 +35,7 @@ function App() {
 }
 
 function Image(props: { screenWidth: number; screenHeight: number }) {
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState<undefined | null | string>(undefined);
   
   useEffect(() => {
     window.api.setImage(window.localStorage.getItem('image'))
@@ -43,7 +44,7 @@ function Image(props: { screenWidth: number; screenHeight: number }) {
   useEffect(() => {
     window.api.onSetImage((_event: Electron.IpcRendererEvent, value: SetStateAction<string>) => {
       console.log('setImage: ', value)
-      window.localStorage.setItem('image', value.toString()) // why? 
+      window.localStorage.setItem('image', value === null ? null : value.toString()) // why? 
       setImage(value)
     })
     return () => window.api.removeSetImageListener()
@@ -99,7 +100,7 @@ function Image(props: { screenWidth: number; screenHeight: number }) {
     }
   }, [top])
 
-  if(image === null) {
+  if(image === undefined) {
     return null
   }
 
@@ -108,7 +109,7 @@ function Image(props: { screenWidth: number; screenHeight: number }) {
       className="image-confetti"
       height={IMAGE_DIMENSION}
       width={IMAGE_DIMENSION}
-      src={`fay://images/${image}`}
+      src={image !== null ? `fay://images/${image}` : behrImg}
       style={{ cursor: "grab", top, left, position: "absolute" }}
       onMouseDown={handleStartMouseDrag}
       onMouseUp={handleEndMouseDrag}
