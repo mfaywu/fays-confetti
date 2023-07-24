@@ -68,7 +68,7 @@ const template: Electron.MenuItemConstructorOptions[] | Electron.MenuItem[] = [
             mainBrowserWindow,
             {
               buttonLabel: "Choose image",
-              filters: [{ name: "Images", extensions: ["jpg", "png", "gif"] }],
+              filters: [{ name: "Images", extensions: ["jpg","jpeg", "png", "gif"] }],
               properties: ["openFile"],
               message: "Choose an image to use as confetti",
             }
@@ -139,7 +139,10 @@ const template: Electron.MenuItemConstructorOptions[] | Electron.MenuItem[] = [
 const menu = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menu);
 
-const createWindow = async (): Promise<void> => {
+const createMainWindow = async (): Promise<void> => {
+  if (BrowserWindow.getAllWindows().length !== 0) {
+    return
+  }
   // We cannot require the screen module until the app is ready.
   const { screen } = await require("electron");
 
@@ -157,7 +160,7 @@ const createWindow = async (): Promise<void> => {
     frame: false,
     transparent: true,
     hasShadow: false,
-    icon: "./icon.png",
+    icon: path.join(process.cwd(), "./src/icon.icns")
   });
 
   mainBrowserWindow.setAlwaysOnTop(true, "floating");
@@ -168,8 +171,10 @@ const createWindow = async (): Promise<void> => {
   mainBrowserWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 };
 
-app.on('open-file', (event, path) => {
+app.on('open-file', async (event, path) => {
   event.preventDefault()
+  await app.whenReady()
+  await createMainWindow();
   console.log('OPEN FILE')
   setImage(path)
 })
@@ -179,7 +184,7 @@ app.on('open-file', (event, path) => {
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
   setupProtocol();
-  createWindow();
+  createMainWindow();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -194,9 +199,7 @@ app.on("window-all-closed", () => {
 app.on("activate", () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
+  createMainWindow();
 });
 
 // In this file you can include the rest of your app's specific main process

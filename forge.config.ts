@@ -5,6 +5,7 @@ import { MakerDeb } from "@electron-forge/maker-deb";
 import { MakerRpm } from "@electron-forge/maker-rpm";
 import { AutoUnpackNativesPlugin } from "@electron-forge/plugin-auto-unpack-natives";
 import { WebpackPlugin } from "@electron-forge/plugin-webpack";
+import path from 'path';
 
 import { mainConfig } from "./webpack.main.config";
 import { rendererConfig } from "./webpack.renderer.config";
@@ -12,7 +13,8 @@ import { rendererConfig } from "./webpack.renderer.config";
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
-    icon: "./src/icon.png",
+    icon: "./src/icon",
+    extendInfo: "./info.plist",
   },
   rebuildConfig: {},
   makers: [
@@ -20,7 +22,8 @@ const config: ForgeConfig = {
     new MakerZIP({}, ["darwin"]),
     new MakerRpm({}),
     // Path to a single image that will act as icon for the application
-    new MakerDeb({ options: { icon: "./src/icon.png" } }),
+    // new MakerDeb({ options: { icon: "./src/icon.png" } }),
+    new MakerDeb({options: {icon: path.join(process.cwd(), "./src/icon.icns")}}),
   ],
   plugins: [
     new AutoUnpackNativesPlugin({}),
@@ -44,3 +47,4 @@ const config: ForgeConfig = {
 };
 
 export default config;
+

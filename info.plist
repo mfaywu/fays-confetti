@@ -1,0 +1,27 @@
+<plist version="1.0">
+  <dict>
+    <key>CFBundleDocumentTypes</key>
+    <array>
+    <dict>
+        <key>CFBundleTypeExtensions</key>
+        <array>
+        <string>png</string>
+        <string>jpg</string>
+        <string>jpeg</string>
+        <string>gif</string>
+        </array>
+        <key>CFBundleTypeName</key>
+        <string>Image Document</string>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>LSItemContentTypes</key>
+        <array>
+        <string>public.jpeg</string>
+        <string>public.png</string>
+        <string>public.jpg</string>
+        <string>public.gif</string>
+        </array>
+    </dict>
+    </array>
+    </dict>
+</plist>
