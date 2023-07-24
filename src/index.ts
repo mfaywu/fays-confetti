@@ -13,29 +13,34 @@ if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
-function setImage(imagePath: string) {
+function setImage(imagePath: string | null) {
   const win = BrowserWindow.getFocusedWindow();
-  if (!win) throw new Error('No window found');
+  if (!win) throw new Error("No window found");
 
-  const appDataPath = app.getPath("userData"); 
-
-  if (fs.existsSync(appDataPath + '/images/' + imagePath)) {
-    console.log('Image already exists, setting image to ' + imagePath)    
-    win.webContents.send("set-image", imagePath);
-    return
+  if (imagePath === null) {
+    win.webContents.send("set-image", null);
+    return;
   }
-  console.log('Image does not exist, copying to App user data')
+
+  const appDataPath = app.getPath("userData");
+
+  if (fs.existsSync(appDataPath + "/images/" + imagePath)) {
+    console.log("Image already exists, setting image to " + imagePath);
+    win.webContents.send("set-image", imagePath);
+    return;
+  }
+  console.log("Image does not exist, copying to App user data");
   if (!fs.existsSync(appDataPath + "/images/")) {
     fs.mkdirSync(appDataPath + "/images/");
   }
   fs.readFile(imagePath, (err, data) => {
-    if (err) throw err;  
-    const newImage = path.basename(imagePath) 
+    if (err) throw err;
+    const newImage = path.basename(imagePath);
     const newImagePath = appDataPath + "/images/" + newImage;
 
     fs.writeFile(newImagePath, data, {}, (err) => {
       if (err) throw err;
-      win.webContents.send("set-image", newImage);      
+      win.webContents.send("set-image", newImage);
     });
   });
 }
@@ -90,6 +95,12 @@ const template: Electron.MenuItemConstructorOptions[] | Electron.MenuItem[] = [
           if (chooseImageAttempt.filePaths.length > 0) {
             setImage(chooseImageAttempt.filePaths[0]);
           }
+        },
+      },
+      {
+        label: "Reset image",
+        click: async () => {
+          setImage(null);
         },
       },
     ] as Electron.MenuItemConstructorOptions[],
@@ -234,15 +245,15 @@ ipcMain.on("set-image", (event, _ignore, options) => {
   const image = options.image;
   if (image) {
     if (fs.existsSync(appDataPath + "/images/" + image)) {
-      console.log('Image found, setting image to ' + image)
+      console.log("Image found, setting image to " + image);
       win.webContents.send("set-image", image);
-      return
+      return;
     } else {
-      console.log('Image ' + image + ' was not found')
+      console.log("Image " + image + " was not found");
     }
   }
 
   // If no image is specified, or if the specified image doesn't exist, use the default image
-  console.log('Setting image to default behr')
+  console.log("Setting image to default behr");
   win.webContents.send("set-image", null);
 });
