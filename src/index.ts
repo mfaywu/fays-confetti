@@ -14,16 +14,28 @@ if (require("electron-squirrel-startup")) {
 }
 
 function setImage(imagePath: string) {
+  const win = BrowserWindow.getFocusedWindow();
+  if (!win) throw new Error('No window found');
+
+  const appDataPath = app.getPath("userData"); 
+
+  if (fs.existsSync(appDataPath + '/images/' + imagePath)) {
+    console.log('Image already exists, setting image to ' + imagePath)    
+    win.webContents.send("set-image", imagePath);
+    return
+  }
+  console.log('Image does not exist, copying to App user data')
+  if (!fs.existsSync(appDataPath + "/images/")) {
+    fs.mkdirSync(appDataPath + "/images/");
+  }
   fs.readFile(imagePath, (err, data) => {
-    if (err) throw err;
-    const appDataPath = app.getPath("userData");
-    const newImage = Date.now() + path.extname(imagePath);
+    if (err) throw err;  
+    const newImage = path.basename(imagePath) 
     const newImagePath = appDataPath + "/images/" + newImage;
 
     fs.writeFile(newImagePath, data, {}, (err) => {
-      const win = BrowserWindow.getFocusedWindow();
-      win && win.webContents.send("set-image", newImage);
       if (err) throw err;
+      win.webContents.send("set-image", newImage);      
     });
   });
 }
