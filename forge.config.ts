@@ -44,6 +44,20 @@ const config: ForgeConfig = {
       },
     }),
   ],
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      platforms: ['darwin', 'linux'],
+      config: {
+        repository: {
+          owner: 'mfaywu',
+          name: 'fays-confetti'
+        },
+        authToken: process.env.GITHUB_TOKEN,
+        prerelease: true
+      }
+    }
+  ]
 };
 
 export default config;
