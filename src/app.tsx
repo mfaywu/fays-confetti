@@ -33,19 +33,19 @@ function App() {
 }
 
 function Image(props: { screenWidth: number; screenHeight: number }) {
-  const [imagePath, setImagePath] = useState(undefined);
+  const [image, setImage] = useState(undefined);
   
   useEffect(() => {
     window.api.onSetImage((_event: Electron.IpcRendererEvent, value: SetStateAction<string>) => {
-      console.log('setImagePath: ', value)
-      setImagePath(value)
+      console.log('setImage: ', value)
+      setImage(value)
     })
     return () => window.api.removeSetImageListener()
   }, [])
 
   useEffect(() => {
-    console.log('imagePath changed: ', imagePath)
-  }, [imagePath])
+    console.log('image changed: ', image)
+  }, [image])
 
   const { screenWidth, screenHeight } = props;
   const IMAGE_DIMENSION = 100;
@@ -93,7 +93,7 @@ function Image(props: { screenWidth: number; screenHeight: number }) {
     }
   }, [top])
 
-  if(imagePath === undefined) {
+  if(image === undefined) {
     return null
   }
 
@@ -102,7 +102,7 @@ function Image(props: { screenWidth: number; screenHeight: number }) {
       className="image-confetti"
       height={IMAGE_DIMENSION}
       width={IMAGE_DIMENSION}
-      src="fay://pets/behr.png"
+      src={`fay://images/${image}`}
       style={{ cursor: "grab", top, left, position: "absolute" }}
       onMouseDown={handleStartMouseDrag}
       onMouseUp={handleEndMouseDrag}

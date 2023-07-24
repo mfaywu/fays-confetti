@@ -1,10 +1,8 @@
-import { session, net, protocol } from "electron"
-import path from "path"
+import { session, net, protocol, app } from "electron"
 import url from "url"
-import behrImage from "./behr.png"
 
 const SCHEME = 'fay'
-const BEHR = 'behr'
+const IMAGES = 'images'
 
 // This ensures that the renderer process can load
 // and stream an image from fay://
@@ -28,15 +26,9 @@ protocol.registerSchemesAsPrivileged([
  */
 export function setupProtocol() {
   session.defaultSession.protocol.handle(SCHEME, (request) => {
-    console.log(`Renderer requested ${request.url}`, { __dirname })
-
-    // If we're requesting 'behr.png', we're requesting the default
-    // image. Otherwise, try to find the file on disk.
-    const isBehr = request.url.endsWith('pets/behr.png')
-    const filePath = request.url.slice(`${SCHEME}://`.length)
-    const fileUrl = isBehr
-      ? url.pathToFileURL(path.join(__dirname, behrImage)).toString()
-      : url.pathToFileURL(path.join(filePath)).toString()
+    const image = request.url.slice(`${SCHEME}://${IMAGES}/`.length)
+    const fileUrl = url.pathToFileURL(app.getPath("userData") + "/images/" + image).toString()
+    console.log(`Renderer requested ${fileUrl}`)
 
     return net.fetch(fileUrl)
   })
