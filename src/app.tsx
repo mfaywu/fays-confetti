@@ -3,6 +3,7 @@ import * as ReactDOM from "react-dom";
 
 export interface IElectronAPI {
   onSetImage: (callback: (event: Electron.IpcRendererEvent, ...args: unknown[]) => void) => Promise<void>,
+  setDefaultImage: () => void,
   removeSetImageListener: () => void
 }
 
@@ -33,11 +34,20 @@ function App() {
 }
 
 function Image(props: { screenWidth: number; screenHeight: number }) {
-  const [image, setImage] = useState(undefined);
+  const [image, setImage] = useState(getImage());
   
+  function getImage() {
+    const image = window.localStorage.getItem('image')
+    if (image === null) {
+      window.api.setDefaultImage()
+    }
+    return image
+  }
+
   useEffect(() => {
     window.api.onSetImage((_event: Electron.IpcRendererEvent, value: SetStateAction<string>) => {
       console.log('setImage: ', value)
+      window.localStorage.setItem('image', value.toString()) // why? 
       setImage(value)
     })
     return () => window.api.removeSetImageListener()
@@ -93,7 +103,7 @@ function Image(props: { screenWidth: number; screenHeight: number }) {
     }
   }, [top])
 
-  if(image === undefined) {
+  if(image === null) {
     return null
   }
 

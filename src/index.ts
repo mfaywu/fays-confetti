@@ -163,40 +163,6 @@ const createWindow = async (): Promise<void> => {
 
   // and load the index.html of the app.
   mainBrowserWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-
-  mainBrowserWindow.once("ready-to-show", () => {
-
-    // TODO: fix, this doesn't work
-    // Check if localStorage already has a chosen image
-    // const savedImage = window.localStorage.getItem('image');
-    // if(fs.existsSync(savedImage)) { mainBrowserWindow.webContents.send('set-image', savedImage); })})
-
-    // Otherwise, use the default Behr image
-    const appDataPath = app.getPath("userData");
-    const behr = 'behr.png'
-    const behrImgPath = appDataPath + "/images/" + behr;
-
-    // Check if images folder exists, create if not
-    if (!fs.existsSync(appDataPath + '/images')) {
-      fs.mkdirSync(appDataPath + '/images');
-    }
-
-    // Check if this behr image file (the default image for Raining Dogs) exists already
-    if (!fs.existsSync(appDataPath + "/images/" + behr)) {
-      // If not, copy the behr image file from the app's resources folder
-      fs.readFile(path.join(process.cwd(), "./src/" + behr), (err, data) => {
-        if (err) throw err;
-
-        fs.writeFile(behrImgPath, data, {}, (err) => { 
-          if (err) throw err;
-        });
-      });
-    }
-
-    // Save the default Behr image path to localStorage
-    // window.localStorage.setItem("image", newImagePath); 
-    mainBrowserWindow.webContents.send("set-image", behr);
-  });
 };
 
 // This method will be called when Electron has finished
@@ -231,3 +197,31 @@ ipcMain.on("set-ignore-mouse-events", (event, ignore, options) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   win && win.setIgnoreMouseEvents(ignore, options);
 });
+
+ipcMain.on('set-default-image', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (!win) throw new Error("No window found");
+
+  const appDataPath = app.getPath("userData");
+    const behr = 'behr.png'
+    const behrImgPath = appDataPath + "/images/" + behr;
+
+    // Check if images folder exists, create if not
+    if (!fs.existsSync(appDataPath + '/images')) {
+      fs.mkdirSync(appDataPath + '/images');
+    }
+
+    // Check if this behr image file (the default image for Raining Dogs) exists already
+    if (!fs.existsSync(appDataPath + "/images/" + behr)) {
+      // If not, copy the behr image file from the app's resources folder
+      fs.readFile(path.join(process.cwd(), "./src/" + behr), (err, data) => {
+        if (err) throw err;
+
+        fs.writeFile(behrImgPath, data, {}, (err) => { 
+          if (err) throw err;
+        });
+      });
+    }
+
+    win.webContents.send("set-image", behr);
+})
